@@ -37,21 +37,12 @@
 
     @code {
         private Price xml_price;
-        private Price lost_profit;
         private string lost_profit_str;
 
         protected override async Task OnInitializedAsync()
         {
-            //Http.BaseAddress = new Uri("http://min-api.cryptocompare.com/");
-            HttpResponseMessage wat = await Http.GetAsync("https://min-api.cryptocompare.com/data/price?fsym=XLM&tsyms=USD");
-            string jsonString = await wat.Content.ReadAsStringAsync();
-
-            xml_price = System.Text.Json.JsonSerializer.Deserialize<Price>(jsonString);
-            var test = 0;
-            test++;
-            lost_profit = new Price();
-            lost_profit.USD = xml_price.USD * Convert.ToDecimal(200000);
-            lost_profit_str = lost_profit.USD.ToString("C2");
+            xml_price = await Http.GetFromJsonAsync<Price>("https://min-api.cryptocompare.com/data/price?fsym=XLM&tsyms=USD");
+            lost_profit_str = (Convert.ToDouble(xml_price.USD) * 200000.0).ToString("C2");
         }
 
         public class Price
