@@ -133,11 +133,6 @@ app {
     display: inline-block
 }
 
-.container {
-    width: 100%;
-    text-align: center;
-}
-
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
