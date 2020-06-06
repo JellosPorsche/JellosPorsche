@@ -1,8 +1,61 @@
 ﻿@page "/"
+@inject HttpClient Http
 
-<h1>If Jello had spent $9,000 on XLM when it was $0.045 instead of his Porsche Cayenne,</h1>
-<h1>he would now have:</h1>
-<h1>$18,000</h1>
+    <audio id="audio" src="sample-data/stellar.mp3" autoplay="false"></audio>
+    <div class="container">
+        <a class="hover_image" href="#">
+            <!-- path/to/first/visible/image: -->
+            <img onclick="document.getElementById('audio').play()" style="margin-left: auto; margin-right: auto; width: 20vw; min-width: 250px;" src="sample-data/porsche_1.png" />
+            <!-- path/to/hover/visible/image: -->
+            <img onclick="document.getElementById('audio').play()" style="margin-left: auto; margin-right: auto; width: 20vw; min-width: 250px;" src="sample-data/porsche_2.png" class="hide" />
+        </a>
+    </div>
+
+    <h1 style="text-align:center">If Jello had spent <span style="color: green">$9,000</span> on XLM when it was <span style="color: green">$0.045</span> instead of his Porsche Cayenne,</h1>
+    <h1 style="text-align:center">he would now have:</h1>
 
 
-<h1>Current XLM price: $0.08</h1>
+    @if (@lost_profit_str == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <h1 style="text-align: center; padding-bottom: 100px; color: green">@lost_profit_str</h1>
+    }
+
+    @if (@xml_price == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <h1 style="text-align:center">Current XLM price: <span style="color: green">$@xml_price.USD</span></h1>
+    }
+
+
+
+    @code {
+        private Price xml_price;
+        private Price lost_profit;
+        private string lost_profit_str;
+
+        protected override async Task OnInitializedAsync()
+        {
+            //Http.BaseAddress = new Uri("http://min-api.cryptocompare.com/");
+            HttpResponseMessage wat = await Http.GetAsync("https://min-api.cryptocompare.com/data/price?fsym=XLM&tsyms=USD");
+            string jsonString = await wat.Content.ReadAsStringAsync();
+
+            xml_price = System.Text.Json.JsonSerializer.Deserialize<Price>(jsonString);
+            var test = 0;
+            test++;
+            lost_profit = new Price();
+            lost_profit.USD = xml_price.USD * Convert.ToDecimal(200000);
+            lost_profit_str = lost_profit.USD.ToString("C2");
+        }
+
+        public class Price
+        {
+            public decimal USD { get; set; } = 0;
+        }
+    }
